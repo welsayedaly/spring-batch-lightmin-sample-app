@@ -2,15 +2,12 @@ package org.tuxdevelop.spring.batch.lightmin.sample.app.configuration;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -19,26 +16,25 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 @Slf4j
 @Configuration
 public class SimpleJobConfiguration {
 
 	@Autowired
-	private JobRepository jobRepository;
+	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
-	private DataSource dataSource;
+	private StepBuilderFactory stepBuilderFactory;
 
 	@Bean
 	public Job simpleJob() {
-		return jobBuilderFactory().get("simpleJob").start(simpleStep()).build();
+		return jobBuilderFactory.get("simpleJob").start(simpleStep()).build();
 	}
 
 	@Bean
 	public Step simpleStep() {
-		return stepBuilderFactory().get("simpleStep").<Long, Long> chunk(1).reader(new SimpleReader())
+		return stepBuilderFactory.get("simpleStep").<Long, Long> chunk(1).reader(new SimpleReader())
 				.writer(new SimpleWriter()).build();
 	}
 
@@ -62,16 +58,6 @@ public class SimpleJobConfiguration {
 			}
 		}
 
-	}
-
-	@Bean
-	public StepBuilderFactory stepBuilderFactory() {
-		return new StepBuilderFactory(jobRepository, new DataSourceTransactionManager(dataSource));
-	}
-
-	@Bean
-	public JobBuilderFactory jobBuilderFactory() {
-		return new JobBuilderFactory(jobRepository);
 	}
 
 }
