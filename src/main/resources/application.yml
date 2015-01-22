@@ -1,2 +1,8 @@
 table:
  prefix: BATCH_
+
+logging:
+ level:
+  org:
+   springframework:
+    web: DEBUG
